@@ -20,13 +20,17 @@ src/
   visualize.py          toutes les fonctions de graphique utilisées dans le notebook
 automobile.ipynb     notebook d'analyse : charge les données, appelle src/, affiche les résultats
 report_analysis.pdf  rapport détaillant la méthodologie et les résultats
+automobiles.csv       dataset (Auto MPG, UCI, domaine public)
+docs/index.html       dashboard web interactif (GitHub Pages)
+reporting/power_query.m   script Power Query (M) pour Power BI / Excel
 ```
 
-**Remarque :** le fichier `automobiles.csv` n'est pas versionné dans ce dépôt — le notebook s'attend à le trouver à la racine pour tourner de bout en bout.
+`automobiles.csv` est le dataset public **Auto MPG** (UCI Machine Learning Repository, domaine public), 392 véhicules 1970-1982 — colonnes renommées pour matcher `src/data.py`, sinon inchangé.
 
 ## Reporting
 
-- **Power Query :** `reporting/power_query.m` — reproduit exactement le nettoyage de `src/data.py` (dropna, mapping d'origine, seuil CAFE) pour charger `automobiles.csv` dans Power BI/Excel. Pas de dashboard en ligne pour ce projet : le dataset source n'étant pas dans le dépôt, il n'y a pas de données réelles à publier (voir remarque ci-dessus).
+- **Dashboard web interactif :** [fryzim.github.io/Automobile-analysis](https://fryzim.github.io/Automobile-analysis/) — page HTML/Chart.js (pas un rapport Power BI), calculée sur les 392 véhicules réels : consommation par origine, conformité CAFE par année, corrélations, poids vs consommation. Source dans `docs/index.html`.
+- **Power Query :** `reporting/power_query.m` — même nettoyage que `src/data.py` (dropna, mapping d'origine, seuil CAFE), prêt à coller dans Power BI Desktop puisque `automobiles.csv` est maintenant dans le dépôt.
 
 ## Stack
 

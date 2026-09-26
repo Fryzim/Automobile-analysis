@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Automobile Dataset — Reporting</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --page: #f9f9f7; --text-primary: #0b0b0b; --text-secondary: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --baseline: #c3c2b7; --border: rgba(11,11,11,0.10); --card-bg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d; --text-primary: #ffffff; --text-secondary: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10); --card-bg: #201f1d;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d; --text-primary: #ffffff; --text-secondary: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10); --card-bg: #201f1d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--page); color: var(--text-primary); }
+  header { padding: 28px 24px 8px; max-width: 1100px; margin: 0 auto; position: relative; }
+  header h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  header p { color: var(--text-secondary); margin: 0 0 16px; max-width: 75ch; }
+  .theme-toggle { position: absolute; top: 24px; right: 24px; border: 1px solid var(--border); background: var(--card-bg);
+    color: var(--text-primary); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
+  main { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 24px; }
+  .kpi { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .kpi .value { font-size: 1.5rem; font-weight: 600; }
+  .kpi .label { color: var(--text-secondary); font-size: 0.78rem; }
+  section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  section h2 { font-size: 1.05rem; margin: 0 0 4px; }
+  section .sub { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 14px; }
+  .chart-wrap { position: relative; height: 300px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .panel h3 { font-size: 0.82rem; margin: 0 0 8px; color: var(--text-secondary); }
+  footer { max-width: 1100px; margin: 0 auto; padding: 10px 24px 40px; color: var(--muted); font-size: 0.8rem; }
+  footer a { color: inherit; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle">🌓 Thème</button>
+<header>
+  <h1>Automobile Dataset — Reporting</h1>
+  <p>392 véhicules (1970-1982, jeu de données public Auto MPG / UCI). Voir le <a href="https://github.com/Fryzim/Automobile-analysis">notebook et le code source</a>.</p>
+</header>
+<main>
+  <div class="kpis">
+    <div class="kpi"><div class="value">392</div><div class="label">véhicules</div></div>
+    <div class="kpi"><div class="value">46.2%</div><div class="label">conformes CAFE (24 mpg)</div></div>
+    <div class="kpi"><div class="value">-0.832</div><div class="label">corrélation poids / mpg</div></div>
+    <div class="kpi"><div class="value">R²=0.673</div><div class="label">régression polynomiale (meilleur degré)</div></div>
+  </div>
+
+  <section>
+    <h2>Caractéristiques moyennes par origine</h2>
+    <p class="sub">Les véhicules japonais et européens sont plus légers, moins puissants, et consomment moins que les véhicules américains.</p>
+    <div class="grid3" id="originGrid"></div>
+  </section>
+
+  <div class="grid2">
+    <section>
+      <h2>Conformité CAFE (24 mpg) par année</h2>
+      <p class="sub">Bond après le second choc pétrolier (1979) : 92%+ des véhicules 1980-82 sont conformes contre ~20-40% en 1970-75.</p>
+      <div class="chart-wrap"><canvas id="chartCafe"></canvas></div>
+    </section>
+    <section>
+      <h2>Corrélation avec le mpg</h2>
+      <p class="sub">Le poids est la variable la plus corrélée à la consommation (encodage séquentiel, une seule teinte).</p>
+      <div class="chart-wrap"><canvas id="chartCorr"></canvas></div>
+    </section>
+  </div>
+
+  <section>
+    <h2>Poids vs consommation, par origine</h2>
+    <p class="sub">392 véhicules — relation quasi-linéaire négative, cohérente avec la corrélation de -0.832.</p>
+    <div class="chart-wrap"><canvas id="chartScatter"></canvas></div>
+  </section>
+</main>
+<footer>Données : Auto MPG (UCI Machine Learning Repository, domaine public) — <a href="https://github.com/Fryzim/Automobile-analysis">retour au dépôt</a>.</footer>
+
+<script>
+const DATA = {"kpis": {"n_cars": 392, "cafe_pct": 46.2, "best_r2": 0.673, "weight_mpg_corr": -0.832}, "origin_stats": {"Europe": {"miles_per_gallon": 27.6, "horsepower": 80.56, "weight_lbs": 2433.47}, "Japan": {"miles_per_gallon": 30.45, "horsepower": 79.84, "weight_lbs": 2221.23}, "USA": {"miles_per_gallon": 20.03, "horsepower": 119.05, "weight_lbs": 3372.49}}, "cafe_by_year": {"1970": 24.1, "1971": 37.0, "1972": 21.4, "1973": 12.5, "1974": 57.7, "1975": 23.3, "1976": 41.2, "1977": 46.4, "1978": 33.3, "1979": 48.3, "1980": 92.6, "1981": 85.7, "1982": 96.7}, "mpg_correlations": {"weight_lbs": -0.832, "displacement": -0.805, "horsepower": -0.778, "cylinders": -0.778, "acceleration": 0.423, "model_year": 0.581}, "regression": [{"Degree": 1, "R^2 Test": 0.6533, "RMSE": 4.2064}, {"Degree": 2, "R^2 Test": 0.673, "RMSE": 4.0852}, {"Degree": 3, "R^2 Test": 0.673, "RMSE": 4.0853}], "scatter": [{"weight_lbs": 3504.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3693.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3436.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3433.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 3449.0, "miles_per_gallon": 17.0, "origin_name": "USA"}, {"weight_lbs": 4341.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4354.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4312.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4425.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 3850.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3563.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3609.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 3761.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3086.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 2372.0, "miles_per_gallon": 24.0, "origin_name": "Japan"}, {"weight_lbs": 2833.0, "miles_per_gallon": 22.0, "origin_name": "USA"}, {"weight_lbs": 2774.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 2587.0, "miles_per_gallon": 21.0, "origin_name": "USA"}, {"weight_lbs": 2130.0, "miles_per_gallon": 27.0, "origin_name": "Japan"}, {"weight_lbs": 1835.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 2672.0, "miles_per_gallon": 25.0, "origin_name": "Europe"}, {"weight_lbs": 2430.0, "miles_per_gallon": 24.0, "origin_name": "Europe"}, {"weight_lbs": 2375.0, "miles_per_gallon": 25.0, "origin_name": "Europe"}, {"weight_lbs": 2234.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 2648.0, "miles_per_gallon": 21.0, "origin_name": "USA"}, {"weight_lbs": 4615.0, "miles_per_gallon": 10.0, "origin_name": "USA"}, {"weight_lbs": 4376.0, "miles_per_gallon": 10.0, "origin_name": "USA"}, {"weight_lbs": 4382.0, "miles_per_gallon": 11.0, "origin_name": "USA"}, {"weight_lbs": 4732.0, "miles_per_gallon": 9.0, "origin_name": "USA"}, {"weight_lbs": 2130.0, "miles_per_gallon": 27.0, "origin_name": "Japan"}, {"weight_lbs": 2264.0, "miles_per_gallon": 28.0, "origin_name": "USA"}, {"weight_lbs": 2228.0, "miles_per_gallon": 25.0, "origin_name": "Japan"}, {"weight_lbs": 2634.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 3439.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 3329.0, "miles_per_gallon": 17.0, "origin_name": "USA"}, {"weight_lbs": 3302.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 3288.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 4209.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4464.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4154.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4096.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4955.0, "miles_per_gallon": 12.0, "origin_name": "USA"}, {"weight_lbs": 4746.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 5140.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 2962.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 2408.0, "miles_per_gallon": 22.0, "origin_name": "USA"}, {"weight_lbs": 3282.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 3139.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 2220.0, "miles_per_gallon": 23.0, "origin_name": "USA"}, {"weight_lbs": 2123.0, "miles_per_gallon": 28.0, "origin_name": "Europe"}, {"weight_lbs": 2074.0, "miles_per_gallon": 30.0, "origin_name": "Europe"}, {"weight_lbs": 2065.0, "miles_per_gallon": 30.0, "origin_name": "Europe"}, {"weight_lbs": 1773.0, "miles_per_gallon": 31.0, "origin_name": "Japan"}, {"weight_lbs": 1613.0, "miles_per_gallon": 35.0, "origin_name": "Japan"}, {"weight_lbs": 1834.0, "miles_per_gallon": 27.0, "origin_name": "Europe"}, {"weight_lbs": 1955.0, "miles_per_gallon": 26.0, "origin_name": "USA"}, {"weight_lbs": 2278.0, "miles_per_gallon": 24.0, "origin_name": "Japan"}, {"weight_lbs": 2126.0, "miles_per_gallon": 25.0, "origin_name": "USA"}, {"weight_lbs": 2254.0, "miles_per_gallon": 23.0, "origin_name": "Europe"}, {"weight_lbs": 2408.0, "miles_per_gallon": 20.0, "origin_name": "USA"}, {"weight_lbs": 2226.0, "miles_per_gallon": 21.0, "origin_name": "USA"}, {"weight_lbs": 4274.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4385.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4135.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4129.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 3672.0, "miles_per_gallon": 17.0, "origin_name": "USA"}, {"weight_lbs": 4633.0, "miles_per_gallon": 11.0, "origin_name": "USA"}, {"weight_lbs": 4502.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4456.0, "miles_per_gallon": 12.0, "origin_name": "USA"}, {"weight_lbs": 4422.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 2330.0, "miles_per_gallon": 19.0, "origin_name": "Japan"}, {"weight_lbs": 3892.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4098.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4294.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4077.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 2933.0, "miles_per_gallon": 18.0, "origin_name": "Europe"}, {"weight_lbs": 2511.0, "miles_per_gallon": 22.0, "origin_name": "Europe"}, {"weight_lbs": 2979.0, "miles_per_gallon": 21.0, "origin_name": "Europe"}, {"weight_lbs": 2189.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 2395.0, "miles_per_gallon": 22.0, "origin_name": "USA"}, {"weight_lbs": 2288.0, "miles_per_gallon": 28.0, "origin_name": "Japan"}, {"weight_lbs": 2506.0, "miles_per_gallon": 23.0, "origin_name": "Japan"}, {"weight_lbs": 2164.0, "miles_per_gallon": 28.0, "origin_name": "USA"}, {"weight_lbs": 2100.0, "miles_per_gallon": 27.0, "origin_name": "Japan"}, {"weight_lbs": 4100.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 3672.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 3988.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4042.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 3777.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4952.0, "miles_per_gallon": 12.0, "origin_name": "USA"}, {"weight_lbs": 4464.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4363.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4237.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4735.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4951.0, "miles_per_gallon": 12.0, "origin_name": "USA"}, {"weight_lbs": 3821.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 3121.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3278.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 2945.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3021.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 2904.0, "miles_per_gallon": 23.0, "origin_name": "USA"}, {"weight_lbs": 1950.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 4997.0, "miles_per_gallon": 11.0, "origin_name": "USA"}, {"weight_lbs": 4906.0, "miles_per_gallon": 12.0, "origin_name": "USA"}, {"weight_lbs": 4654.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4499.0, "miles_per_gallon": 12.0, "origin_name": "USA"}, {"weight_lbs": 2789.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 2279.0, "miles_per_gallon": 20.0, "origin_name": "Japan"}, {"weight_lbs": 2401.0, "miles_per_gallon": 21.0, "origin_name": "USA"}, {"weight_lbs": 2379.0, "miles_per_gallon": 22.0, "origin_name": "Japan"}, {"weight_lbs": 2124.0, "miles_per_gallon": 18.0, "origin_name": "Japan"}, {"weight_lbs": 2310.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 2472.0, "miles_per_gallon": 21.0, "origin_name": "USA"}, {"weight_lbs": 2265.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 4082.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4278.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 1867.0, "miles_per_gallon": 29.0, "origin_name": "Europe"}, {"weight_lbs": 2158.0, "miles_per_gallon": 24.0, "origin_name": "Europe"}, {"weight_lbs": 2582.0, "miles_per_gallon": 20.0, "origin_name": "Europe"}, {"weight_lbs": 2868.0, "miles_per_gallon": 19.0, "origin_name": "Europe"}, {"weight_lbs": 3399.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 2660.0, "miles_per_gallon": 24.0, "origin_name": "Europe"}, {"weight_lbs": 2807.0, "miles_per_gallon": 20.0, "origin_name": "Japan"}, {"weight_lbs": 3664.0, "miles_per_gallon": 11.0, "origin_name": "USA"}, {"weight_lbs": 3102.0, "miles_per_gallon": 20.0, "origin_name": "USA"}, {"weight_lbs": 2901.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 3336.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 1950.0, "miles_per_gallon": 31.0, "origin_name": "Japan"}, {"weight_lbs": 2451.0, "miles_per_gallon": 26.0, "origin_name": "USA"}, {"weight_lbs": 1836.0, "miles_per_gallon": 32.0, "origin_name": "Japan"}, {"weight_lbs": 2542.0, "miles_per_gallon": 25.0, "origin_name": "USA"}, {"weight_lbs": 3781.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 3632.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 3613.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 4141.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 4699.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 4457.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4638.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 4257.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 2219.0, "miles_per_gallon": 29.0, "origin_name": "Europe"}, {"weight_lbs": 1963.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 2300.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 1649.0, "miles_per_gallon": 31.0, "origin_name": "Japan"}, {"weight_lbs": 2003.0, "miles_per_gallon": 32.0, "origin_name": "Japan"}, {"weight_lbs": 2125.0, "miles_per_gallon": 28.0, "origin_name": "USA"}, {"weight_lbs": 2108.0, "miles_per_gallon": 24.0, "origin_name": "Europe"}, {"weight_lbs": 2246.0, "miles_per_gallon": 26.0, "origin_name": "Europe"}, {"weight_lbs": 2489.0, "miles_per_gallon": 24.0, "origin_name": "Japan"}, {"weight_lbs": 2391.0, "miles_per_gallon": 26.0, "origin_name": "Japan"}, {"weight_lbs": 2000.0, "miles_per_gallon": 31.0, "origin_name": "Europe"}, {"weight_lbs": 3264.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 3459.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3432.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3158.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4668.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 4440.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 4498.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 4657.0, "miles_per_gallon": 14.0, "origin_name": "USA"}, {"weight_lbs": 3907.0, "miles_per_gallon": 17.0, "origin_name": "USA"}, {"weight_lbs": 3897.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 3730.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3785.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3039.0, "miles_per_gallon": 21.0, "origin_name": "USA"}, {"weight_lbs": 3221.0, "miles_per_gallon": 20.0, "origin_name": "USA"}, {"weight_lbs": 3169.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 2171.0, "miles_per_gallon": 29.0, "origin_name": "Japan"}, {"weight_lbs": 2639.0, "miles_per_gallon": 23.0, "origin_name": "USA"}, {"weight_lbs": 2914.0, "miles_per_gallon": 20.0, "origin_name": "USA"}, {"weight_lbs": 2592.0, "miles_per_gallon": 23.0, "origin_name": "USA"}, {"weight_lbs": 2702.0, "miles_per_gallon": 24.0, "origin_name": "Japan"}, {"weight_lbs": 2223.0, "miles_per_gallon": 25.0, "origin_name": "Europe"}, {"weight_lbs": 2545.0, "miles_per_gallon": 24.0, "origin_name": "Japan"}, {"weight_lbs": 2984.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 1937.0, "miles_per_gallon": 29.0, "origin_name": "Europe"}, {"weight_lbs": 3211.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 2694.0, "miles_per_gallon": 23.0, "origin_name": "Europe"}, {"weight_lbs": 2957.0, "miles_per_gallon": 23.0, "origin_name": "Europe"}, {"weight_lbs": 2945.0, "miles_per_gallon": 22.0, "origin_name": "Europe"}, {"weight_lbs": 2671.0, "miles_per_gallon": 25.0, "origin_name": "Europe"}, {"weight_lbs": 1795.0, "miles_per_gallon": 33.0, "origin_name": "Japan"}, {"weight_lbs": 2464.0, "miles_per_gallon": 28.0, "origin_name": "Europe"}, {"weight_lbs": 2220.0, "miles_per_gallon": 25.0, "origin_name": "Europe"}, {"weight_lbs": 2572.0, "miles_per_gallon": 25.0, "origin_name": "USA"}, {"weight_lbs": 2255.0, "miles_per_gallon": 26.0, "origin_name": "USA"}, {"weight_lbs": 2202.0, "miles_per_gallon": 27.0, "origin_name": "Europe"}, {"weight_lbs": 4215.0, "miles_per_gallon": 17.5, "origin_name": "USA"}, {"weight_lbs": 4190.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 3962.0, "miles_per_gallon": 15.5, "origin_name": "USA"}, {"weight_lbs": 4215.0, "miles_per_gallon": 14.5, "origin_name": "USA"}, {"weight_lbs": 3233.0, "miles_per_gallon": 22.0, "origin_name": "USA"}, {"weight_lbs": 3353.0, "miles_per_gallon": 22.0, "origin_name": "USA"}, {"weight_lbs": 3012.0, "miles_per_gallon": 24.0, "origin_name": "USA"}, {"weight_lbs": 3085.0, "miles_per_gallon": 22.5, "origin_name": "USA"}, {"weight_lbs": 2035.0, "miles_per_gallon": 29.0, "origin_name": "USA"}, {"weight_lbs": 2164.0, "miles_per_gallon": 24.5, "origin_name": "USA"}, {"weight_lbs": 1937.0, "miles_per_gallon": 29.0, "origin_name": "Europe"}, {"weight_lbs": 1795.0, "miles_per_gallon": 33.0, "origin_name": "Japan"}, {"weight_lbs": 3651.0, "miles_per_gallon": 20.0, "origin_name": "USA"}, {"weight_lbs": 3574.0, "miles_per_gallon": 18.0, "origin_name": "USA"}, {"weight_lbs": 3645.0, "miles_per_gallon": 18.5, "origin_name": "USA"}, {"weight_lbs": 3193.0, "miles_per_gallon": 17.5, "origin_name": "USA"}, {"weight_lbs": 1825.0, "miles_per_gallon": 29.5, "origin_name": "Europe"}, {"weight_lbs": 1990.0, "miles_per_gallon": 32.0, "origin_name": "Japan"}, {"weight_lbs": 2155.0, "miles_per_gallon": 28.0, "origin_name": "Japan"}, {"weight_lbs": 2565.0, "miles_per_gallon": 26.5, "origin_name": "USA"}, {"weight_lbs": 3150.0, "miles_per_gallon": 20.0, "origin_name": "Europe"}, {"weight_lbs": 3940.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 3270.0, "miles_per_gallon": 19.0, "origin_name": "Europe"}, {"weight_lbs": 2930.0, "miles_per_gallon": 19.0, "origin_name": "Japan"}, {"weight_lbs": 3820.0, "miles_per_gallon": 16.5, "origin_name": "Europe"}, {"weight_lbs": 4380.0, "miles_per_gallon": 16.5, "origin_name": "USA"}, {"weight_lbs": 4055.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 3870.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 3755.0, "miles_per_gallon": 13.0, "origin_name": "USA"}, {"weight_lbs": 2045.0, "miles_per_gallon": 31.5, "origin_name": "Japan"}, {"weight_lbs": 2155.0, "miles_per_gallon": 30.0, "origin_name": "USA"}, {"weight_lbs": 1825.0, "miles_per_gallon": 36.0, "origin_name": "Europe"}, {"weight_lbs": 2300.0, "miles_per_gallon": 25.5, "origin_name": "USA"}, {"weight_lbs": 1945.0, "miles_per_gallon": 33.5, "origin_name": "Japan"}, {"weight_lbs": 3880.0, "miles_per_gallon": 17.5, "origin_name": "USA"}, {"weight_lbs": 4060.0, "miles_per_gallon": 17.0, "origin_name": "USA"}, {"weight_lbs": 4140.0, "miles_per_gallon": 15.5, "origin_name": "USA"}, {"weight_lbs": 4295.0, "miles_per_gallon": 15.0, "origin_name": "USA"}, {"weight_lbs": 3520.0, "miles_per_gallon": 17.5, "origin_name": "USA"}, {"weight_lbs": 3425.0, "miles_per_gallon": 20.5, "origin_name": "USA"}, {"weight_lbs": 3630.0, "miles_per_gallon": 19.0, "origin_name": "USA"}, {"weight_lbs": 3525.0, "miles_per_gallon": 18.5, "origin_name": "USA"}, {"weight_lbs": 4220.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 4165.0, "miles_per_gallon": 15.5, "origin_name": "USA"}, {"weight_lbs": 4325.0, "miles_per_gallon": 15.5, "origin_name": "USA"}, {"weight_lbs": 4335.0, "miles_per_gallon": 16.0, "origin_name": "USA"}, {"weight_lbs": 1940.0, "miles_per_gallon": 29.0, "origin_name": "Europe"}, {"weight_lbs": 2740.0, "miles_per_gallon": 24.5, "origin_name": "USA"}, {"weight_lbs": 2265.0, "miles_per_gallon": 26.0, "origin_name": "Japan"}, {"weight_lbs": 2755.0, "miles_per_gallon": 25.5, "origin_name": "USA"}, {"weight_lbs": 2051.0, "miles_per_gallon": 30.5, "origin_name": "USA"}, {"weight_lbs": 2075.0, "miles_per_gallon": 33.5, "origin_name": "USA"}, {"weight_lbs": 1985.0, "miles_per_gallon": 30.0, "origin_name": "Japan"}, {"weight_lbs": 2190.0, "miles_per_gallon": 30.5, "origin_name": "Europe"}, {"weight_lbs": 2815.0, "miles_per_gallon": 22.0, "origin_name": "Japan"}, {"weight_lbs": 2600.0, "miles_per_gallon": 21.5, "origin_name": "Europe"}, {"weight_lbs": 2720.0, "miles_per_gallon": 21.5, "origin_name": "Japan"}, {"weight_lbs": 1985.0, "miles_per_gallon": 43.1, "origin_name": "Europe"}, {"weight_lbs": 1800.0, "miles_per_gallon": 36.1, "origin_name": "USA"}, {"weight_lbs": 1985.0, "miles_per_gallon": 32.8, "origin_name": "Japan"}, {"weight_lbs": 2070.0, "miles_per_gallon": 39.4, "origin_name": "Japan"}, {"weight_lbs": 1800.0, "miles_per_gallon": 36.1, "origin_name": "Japan"}, {"weight_lbs": 3365.0, "miles_per_gallon": 19.9, "origin_name": "USA"}, {"weight_lbs": 3735.0, "miles_per_gallon": 19.4, "origin_name": "USA"}, {"weight_lbs": 3570.0, "miles_per_gallon": 20.2, "origin_name": "USA"}, {"weight_lbs": 3535.0, "miles_per_gallon": 19.2, "origin_name": "USA"}, {"weight_lbs": 3155.0, "miles_per_gallon": 20.5, "origin_name": "USA"}, {"weight_lbs": 2965.0, "miles_per_gallon": 20.2, "origin_name": "USA"}, {"weight_lbs": 2720.0, "miles_per_gallon": 25.1, "origin_name": "USA"}, {"weight_lbs": 3430.0, "miles_per_gallon": 20.5, "origin_name": "USA"}, {"weight_lbs": 3210.0, "miles_per_gallon": 19.4, "origin_name": "USA"}, {"weight_lbs": 3380.0, "miles_per_gallon": 20.6, "origin_name": "USA"}, {"weight_lbs": 3070.0, "miles_per_gallon": 20.8, "origin_name": "USA"}, {"weight_lbs": 3620.0, "miles_per_gallon": 18.6, "origin_name": "USA"}, {"weight_lbs": 3410.0, "miles_per_gallon": 18.1, "origin_name": "USA"}, {"weight_lbs": 3425.0, "miles_per_gallon": 19.2, "origin_name": "USA"}, {"weight_lbs": 3445.0, "miles_per_gallon": 17.7, "origin_name": "USA"}, {"weight_lbs": 3205.0, "miles_per_gallon": 18.1, "origin_name": "USA"}, {"weight_lbs": 4080.0, "miles_per_gallon": 17.5, "origin_name": "USA"}, {"weight_lbs": 2155.0, "miles_per_gallon": 30.0, "origin_name": "USA"}, {"weight_lbs": 2560.0, "miles_per_gallon": 27.5, "origin_name": "Japan"}, {"weight_lbs": 2300.0, "miles_per_gallon": 27.2, "origin_name": "Japan"}, {"weight_lbs": 2230.0, "miles_per_gallon": 30.9, "origin_name": "USA"}, {"weight_lbs": 2515.0, "miles_per_gallon": 21.1, "origin_name": "Japan"}, {"weight_lbs": 2745.0, "miles_per_gallon": 23.2, "origin_name": "USA"}, {"weight_lbs": 2855.0, "miles_per_gallon": 23.8, "origin_name": "USA"}, {"weight_lbs": 2405.0, "miles_per_gallon": 23.9, "origin_name": "Japan"}, {"weight_lbs": 2830.0, "miles_per_gallon": 20.3, "origin_name": "Europe"}, {"weight_lbs": 3140.0, "miles_per_gallon": 17.0, "origin_name": "Europe"}, {"weight_lbs": 2795.0, "miles_per_gallon": 21.6, "origin_name": "Europe"}, {"weight_lbs": 3410.0, "miles_per_gallon": 16.2, "origin_name": "Europe"}, {"weight_lbs": 1990.0, "miles_per_gallon": 31.5, "origin_name": "Europe"}, {"weight_lbs": 2135.0, "miles_per_gallon": 29.5, "origin_name": "Japan"}, {"weight_lbs": 3245.0, "miles_per_gallon": 21.5, "origin_name": "USA"}, {"weight_lbs": 2990.0, "miles_per_gallon": 19.8, "origin_name": "USA"}, {"weight_lbs": 2890.0, "miles_per_gallon": 22.3, "origin_name": "USA"}, {"weight_lbs": 3265.0, "miles_per_gallon": 20.2, "origin_name": "USA"}, {"weight_lbs": 3360.0, "miles_per_gallon": 20.6, "origin_name": "USA"}, {"weight_lbs": 3840.0, "miles_per_gallon": 17.0, "origin_name": "USA"}, {"weight_lbs": 3725.0, "miles_per_gallon": 17.6, "origin_name": "USA"}, {"weight_lbs": 3955.0, "miles_per_gallon": 16.5, "origin_name": "USA"}, {"weight_lbs": 3830.0, "miles_per_gallon": 18.2, "origin_name": "USA"}, {"weight_lbs": 4360.0, "miles_per_gallon": 16.9, "origin_name": "USA"}, {"weight_lbs": 4054.0, "miles_per_gallon": 15.5, "origin_name": "USA"}, {"weight_lbs": 3605.0, "miles_per_gallon": 19.2, "origin_name": "USA"}, {"weight_lbs": 3940.0, "miles_per_gallon": 18.5, "origin_name": "USA"}, {"weight_lbs": 1925.0, "miles_per_gallon": 31.9, "origin_name": "Europe"}, {"weight_lbs": 1975.0, "miles_per_gallon": 34.1, "origin_name": "Japan"}, {"weight_lbs": 1915.0, "miles_per_gallon": 35.7, "origin_name": "USA"}, {"weight_lbs": 2670.0, "miles_per_gallon": 27.4, "origin_name": "USA"}, {"weight_lbs": 3530.0, "miles_per_gallon": 25.4, "origin_name": "Europe"}, {"weight_lbs": 3900.0, "miles_per_gallon": 23.0, "origin_name": "USA"}, {"weight_lbs": 3190.0, "miles_per_gallon": 27.2, "origin_name": "Europe"}, {"weight_lbs": 3420.0, "miles_per_gallon": 23.9, "origin_name": "USA"}, {"weight_lbs": 2200.0, "miles_per_gallon": 34.2, "origin_name": "USA"}, {"weight_lbs": 2150.0, "miles_per_gallon": 34.5, "origin_name": "USA"}, {"weight_lbs": 2020.0, "miles_per_gallon": 31.8, "origin_name": "Japan"}, {"weight_lbs": 2130.0, "miles_per_gallon": 37.3, "origin_name": "Europe"}, {"weight_lbs": 2670.0, "miles_per_gallon": 28.4, "origin_name": "USA"}, {"weight_lbs": 2595.0, "miles_per_gallon": 28.8, "origin_name": "USA"}, {"weight_lbs": 2700.0, "miles_per_gallon": 26.8, "origin_name": "USA"}, {"weight_lbs": 2556.0, "miles_per_gallon": 33.5, "origin_name": "USA"}, {"weight_lbs": 2144.0, "miles_per_gallon": 41.5, "origin_name": "Europe"}, {"weight_lbs": 1968.0, "miles_per_gallon": 38.1, "origin_name": "Japan"}, {"weight_lbs": 2120.0, "miles_per_gallon": 32.1, "origin_name": "USA"}, {"weight_lbs": 2019.0, "miles_per_gallon": 37.2, "origin_name": "Japan"}, {"weight_lbs": 2678.0, "miles_per_gallon": 28.0, "origin_name": "USA"}, {"weight_lbs": 2870.0, "miles_per_gallon": 26.4, "origin_name": "USA"}, {"weight_lbs": 3003.0, "miles_per_gallon": 24.3, "origin_name": "USA"}, {"weight_lbs": 3381.0, "miles_per_gallon": 19.1, "origin_name": "USA"}, {"weight_lbs": 2188.0, "miles_per_gallon": 34.3, "origin_name": "Europe"}, {"weight_lbs": 2711.0, "miles_per_gallon": 29.8, "origin_name": "Japan"}, {"weight_lbs": 2542.0, "miles_per_gallon": 31.3, "origin_name": "Japan"}, {"weight_lbs": 2434.0, "miles_per_gallon": 37.0, "origin_name": "Japan"}, {"weight_lbs": 2265.0, "miles_per_gallon": 32.2, "origin_name": "Japan"}, {"weight_lbs": 2110.0, "miles_per_gallon": 46.6, "origin_name": "Japan"}, {"weight_lbs": 2800.0, "miles_per_gallon": 27.9, "origin_name": "USA"}, {"weight_lbs": 2110.0, "miles_per_gallon": 40.8, "origin_name": "Japan"}, {"weight_lbs": 2085.0, "miles_per_gallon": 44.3, "origin_name": "Europe"}, {"weight_lbs": 2335.0, "miles_per_gallon": 43.4, "origin_name": "Europe"}, {"weight_lbs": 2950.0, "miles_per_gallon": 36.4, "origin_name": "Europe"}, {"weight_lbs": 3250.0, "miles_per_gallon": 30.0, "origin_name": "Europe"}, {"weight_lbs": 1850.0, "miles_per_gallon": 44.6, "origin_name": "Japan"}, {"weight_lbs": 2145.0, "miles_per_gallon": 33.8, "origin_name": "Japan"}, {"weight_lbs": 1845.0, "miles_per_gallon": 29.8, "origin_name": "Europe"}, {"weight_lbs": 2910.0, "miles_per_gallon": 32.7, "origin_name": "Japan"}, {"weight_lbs": 2420.0, "miles_per_gallon": 23.7, "origin_name": "Japan"}, {"weight_lbs": 2500.0, "miles_per_gallon": 35.0, "origin_name": "Europe"}, {"weight_lbs": 2290.0, "miles_per_gallon": 32.4, "origin_name": "Japan"}, {"weight_lbs": 2490.0, "miles_per_gallon": 27.2, "origin_name": "USA"}, {"weight_lbs": 2635.0, "miles_per_gallon": 26.6, "origin_name": "USA"}, {"weight_lbs": 2620.0, "miles_per_gallon": 25.8, "origin_name": "USA"}, {"weight_lbs": 2725.0, "miles_per_gallon": 23.5, "origin_name": "USA"}, {"weight_lbs": 2385.0, "miles_per_gallon": 30.0, "origin_name": "USA"}, {"weight_lbs": 1755.0, "miles_per_gallon": 39.1, "origin_name": "Japan"}, {"weight_lbs": 1875.0, "miles_per_gallon": 39.0, "origin_name": "USA"}, {"weight_lbs": 1760.0, "miles_per_gallon": 35.1, "origin_name": "Japan"}, {"weight_lbs": 2065.0, "miles_per_gallon": 32.3, "origin_name": "Japan"}, {"weight_lbs": 1975.0, "miles_per_gallon": 37.0, "origin_name": "Japan"}, {"weight_lbs": 2050.0, "miles_per_gallon": 37.7, "origin_name": "Japan"}, {"weight_lbs": 1985.0, "miles_per_gallon": 34.1, "origin_name": "Japan"}, {"weight_lbs": 2215.0, "miles_per_gallon": 34.7, "origin_name": "USA"}, {"weight_lbs": 2045.0, "miles_per_gallon": 34.4, "origin_name": "USA"}, {"weight_lbs": 2380.0, "miles_per_gallon": 29.9, "origin_name": "USA"}, {"weight_lbs": 2190.0, "miles_per_gallon": 33.0, "origin_name": "Europe"}, {"weight_lbs": 2210.0, "miles_per_gallon": 33.7, "origin_name": "Japan"}, {"weight_lbs": 2350.0, "miles_per_gallon": 32.4, "origin_name": "Japan"}, {"weight_lbs": 2615.0, "miles_per_gallon": 32.9, "origin_name": "Japan"}, {"weight_lbs": 2635.0, "miles_per_gallon": 31.6, "origin_name": "Japan"}, {"weight_lbs": 3230.0, "miles_per_gallon": 28.1, "origin_name": "Europe"}, {"weight_lbs": 3160.0, "miles_per_gallon": 30.7, "origin_name": "Europe"}, {"weight_lbs": 2900.0, "miles_per_gallon": 25.4, "origin_name": "Japan"}, {"weight_lbs": 2930.0, "miles_per_gallon": 24.2, "origin_name": "Japan"}, {"weight_lbs": 3415.0, "miles_per_gallon": 22.4, "origin_name": "USA"}, {"weight_lbs": 3725.0, "miles_per_gallon": 26.6, "origin_name": "USA"}, {"weight_lbs": 3060.0, "miles_per_gallon": 20.2, "origin_name": "USA"}, {"weight_lbs": 3465.0, "miles_per_gallon": 17.6, "origin_name": "USA"}, {"weight_lbs": 2605.0, "miles_per_gallon": 28.0, "origin_name": "USA"}, {"weight_lbs": 2640.0, "miles_per_gallon": 27.0, "origin_name": "USA"}, {"weight_lbs": 2395.0, "miles_per_gallon": 34.0, "origin_name": "USA"}, {"weight_lbs": 2575.0, "miles_per_gallon": 31.0, "origin_name": "USA"}, {"weight_lbs": 2525.0, "miles_per_gallon": 29.0, "origin_name": "USA"}, {"weight_lbs": 2735.0, "miles_per_gallon": 27.0, "origin_name": "USA"}, {"weight_lbs": 2865.0, "miles_per_gallon": 24.0, "origin_name": "USA"}, {"weight_lbs": 1980.0, "miles_per_gallon": 36.0, "origin_name": "Europe"}, {"weight_lbs": 2025.0, "miles_per_gallon": 37.0, "origin_name": "Japan"}, {"weight_lbs": 1970.0, "miles_per_gallon": 31.0, "origin_name": "Japan"}, {"weight_lbs": 2125.0, "miles_per_gallon": 38.0, "origin_name": "USA"}, {"weight_lbs": 2125.0, "miles_per_gallon": 36.0, "origin_name": "USA"}, {"weight_lbs": 2160.0, "miles_per_gallon": 36.0, "origin_name": "Japan"}, {"weight_lbs": 2205.0, "miles_per_gallon": 36.0, "origin_name": "Japan"}, {"weight_lbs": 2245.0, "miles_per_gallon": 34.0, "origin_name": "Japan"}, {"weight_lbs": 1965.0, "miles_per_gallon": 38.0, "origin_name": "Japan"}, {"weight_lbs": 1965.0, "miles_per_gallon": 32.0, "origin_name": "Japan"}, {"weight_lbs": 1995.0, "miles_per_gallon": 38.0, "origin_name": "Japan"}, {"weight_lbs": 2945.0, "miles_per_gallon": 25.0, "origin_name": "USA"}, {"weight_lbs": 3015.0, "miles_per_gallon": 38.0, "origin_name": "USA"}, {"weight_lbs": 2585.0, "miles_per_gallon": 26.0, "origin_name": "USA"}, {"weight_lbs": 2835.0, "miles_per_gallon": 22.0, "origin_name": "USA"}, {"weight_lbs": 2665.0, "miles_per_gallon": 32.0, "origin_name": "Japan"}, {"weight_lbs": 2370.0, "miles_per_gallon": 36.0, "origin_name": "USA"}, {"weight_lbs": 2950.0, "miles_per_gallon": 27.0, "origin_name": "USA"}, {"weight_lbs": 2790.0, "miles_per_gallon": 27.0, "origin_name": "USA"}, {"weight_lbs": 2130.0, "miles_per_gallon": 44.0, "origin_name": "Europe"}, {"weight_lbs": 2295.0, "miles_per_gallon": 32.0, "origin_name": "USA"}, {"weight_lbs": 2625.0, "miles_per_gallon": 28.0, "origin_name": "USA"}, {"weight_lbs": 2720.0, "miles_per_gallon": 31.0, "origin_name": "USA"}]};
+const ORIGIN_LIGHT = {"USA": "#2a78d6", "Europe": "#1baf7a", "Japan": "#4a3aa7"};
+const ORIGIN_DARK = {"USA": "#3987e5", "Europe": "#199e70", "Japan": "#9085e9"};
+const ORIGIN_ORDER = ['USA', 'Europe', 'Japan'];
+
+function isDark() {
+  const t = document.documentElement.getAttribute('data-theme');
+  if (t === 'dark') return true;
+  if (t === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function ink() { return isDark() ? '#ffffff' : '#0b0b0b'; }
+function inkSecondary() { return isDark() ? '#c3c2b7' : '#52514e'; }
+function gridColor() { return isDark() ? '#2c2c2a' : '#e1e0d9'; }
+function originColor(o) { return (isDark() ? ORIGIN_DARK : ORIGIN_LIGHT)[o]; }
+
+let charts = [];
+function destroyAll() { charts.forEach(c => c.destroy()); charts = []; }
+
+function renderOriginGrid() {
+  const grid = document.getElementById('originGrid');
+  grid.innerHTML = '';
+  const metrics = [
+    { key: 'miles_per_gallon', title: 'MPG moyen' },
+    { key: 'horsepower', title: 'Puissance moyenne (hp)' },
+    { key: 'weight_lbs', title: 'Poids moyen (lbs)' },
+  ];
+  metrics.forEach(m => {
+    const id = 'origin_' + m.key;
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.innerHTML = `<h3>${m.title}</h3><div class="chart-wrap" style="height:180px"><canvas id="${id}"></canvas></div>`;
+    grid.appendChild(panel);
+    const c = new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: {
+        labels: ORIGIN_ORDER,
+        datasets: [{ data: ORIGIN_ORDER.map(o => DATA.origin_stats[o][m.key]), backgroundColor: ORIGIN_ORDER.map(originColor), borderRadius: 4 }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: ink() }, grid: { display: false } },
+          y: { ticks: { color: inkSecondary() }, grid: { color: gridColor() } },
+        },
+      },
+    });
+    charts.push(c);
+  });
+}
+
+function renderCafe() {
+  const years = Object.keys(DATA.cafe_by_year);
+  const values = years.map(y => DATA.cafe_by_year[y]);
+  const c = new Chart(document.getElementById('chartCafe'), {
+    type: 'line',
+    data: { labels: years, datasets: [{ data: values, borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, pointRadius: 3, tension: 0.2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: isDark() ? '#201f1d' : '#ffffff', titleColor: ink(), bodyColor: inkSecondary(), borderColor: gridColor(), borderWidth: 1 } },
+      scales: {
+        x: { ticks: { color: inkSecondary() }, grid: { color: gridColor() } },
+        y: { min: 0, max: 100, title: { display: true, text: '% conforme (>= 24 mpg)', color: inkSecondary() }, ticks: { color: inkSecondary() }, grid: { color: gridColor() } },
+      },
+    },
+  });
+  charts.push(c);
+}
+
+function renderCorr() {
+  const entries = Object.entries(DATA.mpg_correlations).sort((a,b) => a[1]-b[1]);
+  const c = new Chart(document.getElementById('chartCorr'), {
+    type: 'bar',
+    data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: '#2a78d6', borderRadius: 4 }] },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: -1, max: 1, title: { display: true, text: 'Corrélation avec mpg', color: inkSecondary() }, ticks: { color: inkSecondary() }, grid: { color: gridColor() } },
+        y: { ticks: { color: ink(), font: { size: 11 } }, grid: { display: false } },
+      },
+    },
+  });
+  charts.push(c);
+}
+
+function renderScatter() {
+  const datasets = ORIGIN_ORDER.map(o => ({
+    label: o,
+    data: DATA.scatter.filter(r => r.origin_name === o).map(r => ({ x: r.weight_lbs, y: r.miles_per_gallon })),
+    backgroundColor: originColor(o),
+    pointRadius: 3,
+  }));
+  const c = new Chart(document.getElementById('chartScatter'), {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: ink(), boxWidth: 12 } } },
+      scales: {
+        x: { title: { display: true, text: 'Poids (lbs)', color: inkSecondary() }, ticks: { color: inkSecondary() }, grid: { color: gridColor() } },
+        y: { title: { display: true, text: 'MPG', color: inkSecondary() }, ticks: { color: inkSecondary() }, grid: { color: gridColor() } },
+      },
+    },
+  });
+  charts.push(c);
+}
+
+function renderAll() {
+  destroyAll();
+  renderOriginGrid();
+  renderCafe();
+  renderCorr();
+  renderScatter();
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  renderAll();
+});
+
+renderAll();
+</script>
+</body>
+</html>
