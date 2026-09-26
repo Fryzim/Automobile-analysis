@@ -12,8 +12,17 @@ Analyse exploratoire et modélisation statistique d'un jeu de données de véhic
 
 ## Contenu du dépôt
 
-- `automobile.ipynb` — notebook complet (nettoyage, exploration, ACP, régression)
-- `report_analysis.pdf` — rapport détaillant la méthodologie et les résultats
+```
+src/
+  data.py             chargement + nettoyage (dropna, origine, seuil CAFE)
+  pca_analysis.py      standardisation + ACP (variance expliquée, projection 2D, contributions)
+  regression.py        régression polynomiale (weight -> mpg) et régression multiple
+  visualize.py          toutes les fonctions de graphique utilisées dans le notebook
+automobile.ipynb     notebook d'analyse : charge les données, appelle src/, affiche les résultats
+report_analysis.pdf  rapport détaillant la méthodologie et les résultats
+```
+
+**Remarque :** le fichier `automobiles.csv` n'est pas versionné dans ce dépôt — le notebook s'attend à le trouver à la racine pour tourner de bout en bout.
 
 ## Stack
 
