@@ -24,6 +24,10 @@ report_analysis.pdf  rapport détaillant la méthodologie et les résultats
 
 **Remarque :** le fichier `automobiles.csv` n'est pas versionné dans ce dépôt — le notebook s'attend à le trouver à la racine pour tourner de bout en bout.
 
+## Reporting
+
+- **Power Query :** `reporting/power_query.m` — reproduit exactement le nettoyage de `src/data.py` (dropna, mapping d'origine, seuil CAFE) pour charger `automobiles.csv` dans Power BI/Excel. Pas de dashboard en ligne pour ce projet : le dataset source n'étant pas dans le dépôt, il n'y a pas de données réelles à publier (voir remarque ci-dessus).
+
 ## Stack
 
 Python — `pandas`, `numpy`, `scikit-learn` (PCA, régression), `matplotlib`, `seaborn`
