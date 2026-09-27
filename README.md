@@ -32,8 +32,8 @@ reporting/
 
 ## Reporting
 
-- **Dashboard web interactif :** [fryzim.github.io/Automobile-analysis](https://fryzim.github.io/Automobile-analysis/) — page HTML/Chart.js (pas un rapport Power BI), calculée sur les 392 véhicules réels : consommation par origine, conformité CAFE par année, corrélations, poids vs consommation. Source dans `docs/index.html`.
-- **Rapport Power BI :** [`reporting/automobile_analysis_report.pbix`](reporting/automobile_analysis_report.pbix) — construit avec `reporting/power_query.m` pour le chargement/nettoyage. KPI (véhicules, puissance/poids/cylindrée moyens), répartition par origine, % de conformité CAFE par année, poids vs consommation par origine, évolution du mpg moyen par année.
+- **Dashboard web interactif :** [fryzim.github.io/Automobile-analysis](https://fryzim.github.io/Automobile-analysis/) page HTML/Chart.js, calculée sur les 392 véhicules réels : consommation par origine, conformité CAFE par année, corrélations, poids vs consommation. Source dans `docs/index.html`.
+- **Rapport Power BI :** [`reporting/automobile_analysis_report.pbix`](reporting/automobile_analysis_report.pbix) construit avec `reporting/power_query.m` pour le chargement/nettoyage. KPI (véhicules, puissance/poids/cylindrée moyens), répartition par origine, % de conformité CAFE par année, poids vs consommation par origine, évolution du mpg moyen par année.
 
   ![Rapport Power BI — Automobile Analysis](reporting/powerbi_dashboard.png)
 
