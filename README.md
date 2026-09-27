@@ -22,7 +22,10 @@ automobile.ipynb     notebook d'analyse : charge les données, appelle src/, aff
 report_analysis.pdf  rapport détaillant la méthodologie et les résultats
 automobiles.csv       dataset (Auto MPG, UCI, domaine public)
 docs/index.html       dashboard web interactif (GitHub Pages)
-reporting/power_query.m   script Power Query (M) pour Power BI / Excel
+reporting/
+  power_query.m                   script Power Query (M) pour Power BI / Excel
+  automobile_analysis_report.pbix  rapport Power BI
+  powerbi_dashboard.png            capture d'écran du rapport
 ```
 
 `automobiles.csv` est le dataset public **Auto MPG** (UCI Machine Learning Repository, domaine public), 392 véhicules 1970-1982 — colonnes renommées pour matcher `src/data.py`, sinon inchangé.
@@ -30,7 +33,9 @@ reporting/power_query.m   script Power Query (M) pour Power BI / Excel
 ## Reporting
 
 - **Dashboard web interactif :** [fryzim.github.io/Automobile-analysis](https://fryzim.github.io/Automobile-analysis/) — page HTML/Chart.js (pas un rapport Power BI), calculée sur les 392 véhicules réels : consommation par origine, conformité CAFE par année, corrélations, poids vs consommation. Source dans `docs/index.html`.
-- **Power Query :** `reporting/power_query.m` — même nettoyage que `src/data.py` (dropna, mapping d'origine, seuil CAFE), prêt à coller dans Power BI Desktop puisque `automobiles.csv` est maintenant dans le dépôt.
+- **Rapport Power BI :** [`reporting/automobile_analysis_report.pbix`](reporting/automobile_analysis_report.pbix) — construit avec `reporting/power_query.m` pour le chargement/nettoyage. KPI (véhicules, puissance/poids/cylindrée moyens), répartition par origine, % de conformité CAFE par année, poids vs consommation par origine, évolution du mpg moyen par année.
+
+  ![Rapport Power BI — Automobile Analysis](reporting/powerbi_dashboard.png)
 
 ## Stack
 
